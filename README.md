@@ -1,4 +1,4 @@
-# Manga Panel Vectorizer
+# BLAKE!
 
 A Python-based tool for vectorizing manga panels, converting raster images into scalable vector graphics.
 
