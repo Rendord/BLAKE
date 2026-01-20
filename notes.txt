@@ -1,0 +1,1 @@
+using AI image pipelines to visualize details
