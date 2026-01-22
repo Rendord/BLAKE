@@ -1,1 +1,6 @@
 using AI image pipelines to visualize details
+
+today I learned about the concept of probing:
+sliding a 3x3 grid over every pixel in an image
+and performing operations on a pixel based on it's neighbours
+this will be invaluable when processing panels later on
