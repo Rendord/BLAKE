@@ -67,6 +67,28 @@ img_rotated_cv = cv2.rotate(resized, cv2.ROTATE_90_CLOCKWISE)
 # we want to be able to apply operations and split the window so we can perform
 # a couple operations and then split at that stage and then continue applying operations to the second panel
 
+#CLASS
+
+#PANEL SESSION
+#OPERATIONS -> LINKED LIST? 
+#image path
+
+#ABSTRACT METHOD -> VISUAL OP
+# performs visual operation and adds it to the linked list
+# operations can be dictionaries or their own class 
+# kwaargs or something similar
+
+#METHOD side-by-side
+# creates a list of images that consist of each operation of the visual operations linked list in order
+# spawns a regular openCV window with all images concatted next to each other
+
+
+
+#CLASS view
+
+#this class has a panel session and handles rendering and updating of the panel after operations
+# use a small UI framework
+
 
 #PROBLEM: when dilating and eroding the lines that determine the shape of an object
 # fade away and the object becomes one with the background
