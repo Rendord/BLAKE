@@ -4,3 +4,10 @@ today I learned about the concept of probing:
 sliding a 3x3 grid over every pixel in an image
 and performing operations on a pixel based on it's neighbours
 this will be invaluable when processing panels later on
+
+Frame extraction -> what we want to do later is dissecting a panel into it's individual frames
+An individual frame can be examined as a camera shot from a single point, so this shot adheres to a single perspective
+Therefore the order becomes -> Dissect into frames -> turn into SVGs -> extract Geometry
+We can use even more computer vision to recognize elements as either background or foreground, this way we can remove characters and visual effects
+After that we can try to reconstruct the geometry that those elements were overlaying
+

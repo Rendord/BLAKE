@@ -1,8 +1,12 @@
 # Core dependencies for manga panel vectorizer
-# Add your dependencies here as the project develops
+# Interactive operation timeline tool
 
-# Example dependencies (uncomment when needed):
-# numpy>=1.24.0
-# opencv-python>=4.8.0
-# Pillow>=10.0.0
-# scikit-image>=0.21.0
+# Computer Vision
+numpy>=1.24.0
+opencv-python>=4.8.0
+
+# GUI Framework
+PyQt6>=6.6.0
+
+# Image Format Support (JP2)
+Pillow>=10.0.0

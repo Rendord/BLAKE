@@ -1,20 +1,24 @@
 # BLAKE!
 
-A Python-based tool for vectorizing manga panels, converting raster images into scalable vector graphics.
+A Python-based tool for manga panel image processing, featuring an interactive timeline-based operation tool for experimenting with OpenCV operations.
 
 ## Project Structure
 
 ```
-manga-panel-vectorizer/
-├── src/                # Source code for the vectorizer
-├── data/               # Input manga images and datasets
-├── output/             # Generated vector outputs (gitignored)
-├── notebooks/          # Jupyter notebooks for experimentation
-├── tests/              # Unit and integration tests
-├── docs/               # Documentation files
-├── requirements.txt    # Python dependencies
-├── .gitignore         # Git ignore patterns
-└── README.md          # This file
+BLAKE/
+├── app.py                    # Interactive GUI application (PyQt6)
+├── operations.py             # Operation class hierarchy
+├── session.py               # Timeline management
+├── geometry.py              # Geometric dataclasses
+├── test_vectorization.py    # Image processing experiments
+├── operations_timeline.md   # Design specification
+├── requirements.txt         # Python dependencies
+├── .venv/                   # Virtual environment (uv)
+├── manga_scans/
+│   └── jp2/                # Manga panel images (396 JP2 files)
+├── src/                    # Source package (in development)
+└── util/                   # Utility scripts
+    └── rename.py           # File renaming utility
 ```
 
 ## Setup Instructions
@@ -26,37 +30,69 @@ manga-panel-vectorizer/
 
 ### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd BLAKE!
-   ```
+#### Using uv (recommended)
 
-2. **Create a virtual environment**
-   ```bash
-   python -m venv venv
-   ```
+```bash
+# Create virtual environment
+uv venv
 
-3. **Activate the virtual environment**
+# Activate virtual environment
+source .venv/bin/activate  # macOS/Linux
+.venv\Scripts\activate     # Windows
 
-   On Windows:
-   ```bash
-   venv\Scripts\activate
-   ```
+# Install dependencies
+uv pip install -r requirements.txt
+```
 
-   On macOS/Linux:
-   ```bash
-   source venv/bin/activate
-   ```
+#### Using pip
 
-4. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+source venv/bin/activate  # macOS/Linux
+venv\Scripts\activate     # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+```
 
 ### Usage
 
-Coming soon - vectorization implementation in progress.
+#### Interactive Operations Tool
+
+Run the interactive manga panel operation timeline tool:
+
+```bash
+# Activate virtual environment
+source .venv/bin/activate  # macOS/Linux
+# OR
+.venv\Scripts\activate     # Windows
+
+# Run the application
+python app.py
+
+# Or specify custom image directory
+python app.py /path/to/images
+```
+
+**Keyboard Controls:**
+- `+` - Apply selected operation
+- `-` - Delete operation (undo)
+- `↑/↓` - Move cursor backward/forward (undo/redo)
+- `←/→` - Navigate to previous/next manga panel
+- `r` - Reset all operations
+- `c` - Open side-by-side comparison view
+
+**Available Operations:**
+- **Threshold**: Binary thresholding (manual or OTSU)
+- **Rotate**: Rotation with ±1° and ±90° quick buttons
+- **MorphOpen**: Morphological opening (noise removal)
+- **MorphClose**: Morphological closing (hole filling)
+- **Invert**: Image inversion (black ↔ white)
+
+The tool features a cursor-based timeline that allows you to apply operations, navigate through operation history, and compare different processing states side-by-side.
 
 ### Deactivating the Virtual Environment
 
@@ -67,4 +103,25 @@ deactivate
 
 ## Development
 
-This project is currently in scaffolding phase. Vectorization functionality will be added in future iterations.
+### Current Status
+
+**✓ Interactive Operations Tool** - MVP complete with timeline-based operation management
+- Cursor-based timeline with undo/redo
+- 5 core image operations (Threshold, Rotate, Morph Open/Close, Invert)
+- Side-by-side comparison view
+- Bounded history (50 ops past/future)
+- Keyboard-driven workflow
+
+**In Progress** - Manga panel vectorization pipeline
+
+### Dependencies
+
+- Python 3.11+
+- NumPy ≥1.24.0
+- OpenCV ≥4.8.0
+- PyQt6 ≥6.6.0
+- Pillow ≥10.0.0
+
+### Design Documentation
+
+See `operations_timeline.md` for the complete design specification of the interactive operations tool.
