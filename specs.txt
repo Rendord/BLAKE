@@ -27,9 +27,15 @@ use Tkinter or pyQt for cross platform support
 
 + applies the currently selected operation to the current point of the linked list
 - removes the currently viewed operation from the linked list
- 
+
 up arrow key goes up the linked list
 down arrow key goes down the linked list
 left arrow key goes to the previous manga panel
 right arrow key goes to the next manga panel
 r resets the panel session
+
+cache and recompute
+the beauty is we can recompute from intermediary images. 
+
+NonOperation that does nothing to be the tail of the LinkedList upon creation
+Once we hit the max Operations we release the current tail and rebind it
