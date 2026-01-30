@@ -1,7 +1,6 @@
-from typing import Protocol, List, Optional
-from typing import List
+from typing import Protocol, Optional
 from cv2.typing import MatLike
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 import gc
 
 class VisOp(Protocol):
