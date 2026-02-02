@@ -28,6 +28,8 @@ panelPath_2 = Path("manga_scans/jp2/BLAME!_Master_Edition_v01__0000.jp2")
 img = cv2.imread(str(panelPath), cv2.IMREAD_GRAYSCALE)
 img_2 = cv2.imread(str(panelPath_2), cv2.IMREAD_GRAYSCALE)
 
+b, w = cv2.split(img)
+
 
 #KERNEL
 kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))

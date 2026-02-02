@@ -21,6 +21,9 @@ observer pattern for knowing when to rerender (traversing operations or applying
 View is a UI element that has the currently selected panel with under that a drop down with available operations
 depending on the selection operation the input fields under the dropdown are generated dynamically and contain the hyper parameters for each operation 
 
+QT GRID
+PARSE JSON FOR implementation of App Structure
+
 use Tkinter or pyQt for cross platform support
 
 
