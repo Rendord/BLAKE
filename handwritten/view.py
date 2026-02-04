@@ -1,4 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QWidget, QGridLayout, QSizePolicy
+from PyQt6.QtCore import Qt
 
 
 class ColorSquare(QWidget):
@@ -7,6 +8,7 @@ class ColorSquare(QWidget):
         # Stretch to fill grid cell
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         # Set background color
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.setStyleSheet(f"background-color: {color};")
 
 
@@ -19,13 +21,17 @@ window = QWidget()
 grid = QGridLayout(window)
 
 red = ColorSquare('red')
+red_2 = ColorSquare('red')
+red_3 = ColorSquare('red')
 blue = ColorSquare('blue')
 yellow = ColorSquare('yellow')
 
 
-grid.addWidget(red, 1, 1)
-grid.addWidget(red, 0, 1)
-grid.addWidget(red, 1, 1)
+grid.addWidget(yellow, 0, 0, 1, 1)
+grid.addWidget(blue, 0, 2, 2, 1)
+
+#grid.addWidget(red, 2, 1, 1, 3)
+
 
 
 
