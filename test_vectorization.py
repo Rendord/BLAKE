@@ -92,12 +92,6 @@ img_rotated_cv = cv2.rotate(resized, cv2.ROTATE_90_CLOCKWISE)
 # use a small UI framework
 
 
-#PROBLEM: when dilating and eroding the lines that determine the shape of an object
-# fade away and the object becomes one with the background
-# we need to find a way to preserve these lines while cleaning up noise
-# manga panels and 2D art relies heavily on suggestion to define shapes and forms
-# so we need to find a way to complete lines and make them thicker
-
 print(img.dtype, img.shape, img.min(), img.max())
 print("retval threshhold used:", retval)
 
