@@ -1,6 +1,7 @@
-from typing import Protocol, Optional
+from typing import Protocol, Optional, List
 from cv2.typing import MatLike
 from dataclasses import dataclass
+from pathlib import Path
 import gc
 
 class VisOp(Protocol):
@@ -9,13 +10,18 @@ class VisOp(Protocol):
     next: Optional["VisOp"]
     previous: Optional["VisOp"]
 
-@dataclass(slots=True)
 class PanelSession():
-    current: Optional[VisOp] = None
-    tail: Optional[VisOp] = None
-    timeline_size: int = 0
-    path: str = ""
+    current: Optional[VisOp]
+    tail: Optional[VisOp]
+    timeline_size: int
+    image_paths: List[Path]
     MAX_OPERATIONS: int = 50
+
+    def __init__(self):
+        self.current = None
+        self.tail = None
+        self.timeline_size = 0
+        self.image_paths = []
 
     def insertOp(self, insertion:VisOp) -> None:
         #insert operation into timeline
@@ -48,4 +54,18 @@ class PanelSession():
             self.current = cur.previous
         #else: pass
 
+    def load_image_paths(self, src: str | Path) -> int:
+        src = Path(src)
 
+        if not src.is_dir(): return 0
+
+        valid_extensions = {'.jp2','.png','.jpeg','.jpg','.webp'}
+
+        self.image_paths.clear()
+        for path in src.iterdir():
+            if path.is_file() and path.suffix.lower() in valid_extensions:
+                self.image_paths.append(path)
+
+        self.image_paths.sort()
+
+        return len(self.image_paths)

@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QShortcut, QKeySequence
 from handwritten.view import TimeLineApplicationView, matLikeToQImage
+from handwritten.panelsession import PanelSession
 import cv2
 import sys
 from pathlib import Path
@@ -19,8 +20,13 @@ def main():
 
     panel_w, panel_h = int(WIDTH * 0.85), int(HEIGHT * 0.85)
 
+
+    #initialize viewing session
+    panel_session = PanelSession()
+    page_count = panel_session.load_image_paths('manga_scans\jp2')
+
     #load manga panel
-    panelPath = Path("manga_scans/jp2/BLAME!_Master_Edition_v01__0000.jp2")
+    panelPath = panel_session.image_paths[0]
     img = cv2.imread(str(panelPath), cv2.IMREAD_GRAYSCALE)
     qimg = matLikeToQImage(img)
     pixmap = QPixmap.fromImage(qimg)
