@@ -28,6 +28,8 @@ panelPath_2 = Path("manga_scans/jp2/BLAME!_Master_Edition_v01__0000.jp2")
 img = cv2.imread(str(panelPath), cv2.IMREAD_GRAYSCALE)
 img_2 = cv2.imread(str(panelPath_2), cv2.IMREAD_GRAYSCALE)
 
+b, w = cv2.split(img)
+
 
 #KERNEL
 kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
@@ -89,12 +91,6 @@ img_rotated_cv = cv2.rotate(resized, cv2.ROTATE_90_CLOCKWISE)
 #this class has a panel session and handles rendering and updating of the panel after operations
 # use a small UI framework
 
-
-#PROBLEM: when dilating and eroding the lines that determine the shape of an object
-# fade away and the object becomes one with the background
-# we need to find a way to preserve these lines while cleaning up noise
-# manga panels and 2D art relies heavily on suggestion to define shapes and forms
-# so we need to find a way to complete lines and make them thicker
 
 print(img.dtype, img.shape, img.min(), img.max())
 print("retval threshhold used:", retval)

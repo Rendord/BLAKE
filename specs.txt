@@ -1,0 +1,44 @@
+
+
+CLASS -> PANELSESSION
+property -> Operations (either a linkedlist or a heap of operation objects that stores the operations that have been performed) 
+property -> image path to the currently rendered panel of the manga
+method -> perform Operation (this takes an operation name and performs the given operation to the image and adds its to the list)
+method -> render side-by-side (this method spawns an openCV window independent of the main view with the last 4 operations concatted together from left to right)
+
+CLASS -> OPERATION <Abstract>
+A data class that has a name off the operation
+and a dictionary with arg names and values
+a method -> apply that takes an input image and returns the image after applying the operation
+
+OPERATION CLASSES [Threshold, Rotate, Open, Close] (for now)  
+
+CLASS -> VIEW
+property -> PanelSession
+method -> render() this renders the current place we are in the linked list
+keyboard listener?
+observer pattern for knowing when to rerender (traversing operations or applying them) 
+View is a UI element that has the currently selected panel with under that a drop down with available operations
+depending on the selection operation the input fields under the dropdown are generated dynamically and contain the hyper parameters for each operation 
+
+QT GRID
+PARSE JSON FOR implementation of App Structure
+
+use Tkinter or pyQt for cross platform support
+
+
+
++ applies the currently selected operation to the current point of the linked list
+- removes the currently viewed operation from the linked list
+
+up arrow key goes up the linked list
+down arrow key goes down the linked list
+left arrow key goes to the previous manga panel
+right arrow key goes to the next manga panel
+r resets the panel session
+
+cache and recompute
+the beauty is we can recompute from intermediary images. 
+
+NonOperation that does nothing to be the tail of the LinkedList upon creation
+Once we hit the max Operations we release the current tail and rebind it

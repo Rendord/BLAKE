@@ -5,9 +5,22 @@ sliding a 3x3 grid over every pixel in an image
 and performing operations on a pixel based on it's neighbours
 this will be invaluable when processing panels later on
 
-Frame extraction -> what we want to do later is dissecting a panel into it's individual frames
+Frame extraction -> what we want to do later is dissecting a panel into it's individual frames (segmentation)
 An individual frame can be examined as a camera shot from a single point, so this shot adheres to a single perspective
 Therefore the order becomes -> Dissect into frames -> turn into SVGs -> extract Geometry
 We can use even more computer vision to recognize elements as either background or foreground, this way we can remove characters and visual effects
 After that we can try to reconstruct the geometry that those elements were overlaying
 
+The timeline tool can be expanded to save workflows and configurations
+I like the idea of turning it into a sandbox, a starting point that feeds into Dagster
+we save the sequence of events as a preprocessing configuration that can be used by dagster
+
+Adding alternative numpad controls
+
+#PROBLEM: when dilating and eroding the lines that determine the shape of an object
+# fade away and the object becomes one with the background
+# we need to find a way to preserve these lines while cleaning up noise
+# manga panels and 2D art relies heavily on suggestion to define shapes and forms
+# so we need to find a way to complete lines and make them thicker
+
+See if we can prompt claude to turn my codebases TODO's into actionable github issues
