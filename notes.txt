@@ -22,3 +22,5 @@ Adding alternative numpad controls
 # we need to find a way to preserve these lines while cleaning up noise
 # manga panels and 2D art relies heavily on suggestion to define shapes and forms
 # so we need to find a way to complete lines and make them thicker
+
+See if we can prompt claude to turn my codebases TODO's into actionable github issues

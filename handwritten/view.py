@@ -1,9 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QSizePolicy, QLabel, QVBoxLayout, QHBoxLayout, QPushButton, QComboBox
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QImage, QPixmap
-import cv2
-from cv2.typing import MatLike
-import numpy as np
+from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtGui import QPixmap
+from typing import Tuple
 
 class ColorSquare(QWidget):
     def __init__(self, color: str):
@@ -34,10 +32,10 @@ class TimeLineContext(QWidget):
     insert_op: ExpandingButton
     iteration_idx: ExpandingTextLabel
 
-    def __init__(self):
+    def __init__(self, page_count):
         super().__init__()
         self.layout = QHBoxLayout(self)
-        self.page_count = ExpandingTextLabel("Panel: 0")
+        self.page_count = ExpandingTextLabel(f"Panel: 1 / {page_count}")
         self.remove_op = ExpandingButton("-")
         self.op_dropdown = QComboBox()
         self.op_dropdown.addItems(["Threshold", "MorphOpen", "MorphClose"])
@@ -50,19 +48,28 @@ class TimeLineContext(QWidget):
         self.layout.addWidget(self.insert_op, stretch=5)
         self.layout.addWidget(self.iteration_idx, stretch=10, alignment=Qt.AlignmentFlag.AlignRight)
 
+    #TODO split UI into 2 labels 1 for page count and 1 for index
+    def updatePageCount(self, index: int, page_count: int):
+        self.page_count.setText(f"Panel: {index + 1} / {page_count}") 
+
+
 class NavigationControls(QWidget):
     layout: QHBoxLayout
     left_arrow: ExpandingButton
     right_arrow: ExpandingButton
     up_arrow: ExpandingButton
     down_arrow: ExpandingButton
+    next = pyqtSignal()
+    previous = pyqtSignal()
 
     def __init__(self):
         super().__init__()
         self.layout = QHBoxLayout(self)
         #create arrow keys
         self.left_arrow = ExpandingButton("←")
+        self.left_arrow.clicked.connect(self.previous)
         self.right_arrow = ExpandingButton("→")
+        self.right_arrow.clicked.connect(self.next)
         self.up_arrow = ExpandingButton("↑")
         self.down_arrow = ExpandingButton("↓")
 
@@ -82,52 +89,52 @@ class TimeLineApplicationView(QWidget):
     timeline_context: TimeLineContext
     panel_frame: QLabel
     navigation_controls: NavigationControls
+    index: int
+    page_count: int
+    request_page = pyqtSignal(int)
 
-    def __init__(self, pixmap: QPixmap):
+    def __init__(self, page_count, pixmap: QPixmap, scaled_resolution: Tuple[int,int]):
         super().__init__()
+        self.index = 0
+        self.page_count = page_count
         self.layout = QVBoxLayout(self)
-        self.timeline_context = TimeLineContext()
+        self.timeline_context = TimeLineContext(self.page_count)
+        frame_w, frame_h = scaled_resolution
         self.panel_frame = QLabel()
+        self.panel_frame.setFixedSize(frame_w, frame_h)
+        self.displayPixmap(pixmap)
         self.navigation_controls = NavigationControls()
-        self.panel_frame.setPixmap(pixmap)
+        self.navigation_controls.next.connect(self.onNext)
+        self.navigation_controls.previous.connect(self.onPrevious)
         self.layout.addWidget(self.timeline_context, stretch=5)
         self.layout.addWidget(self.panel_frame, alignment=Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(self.navigation_controls, stretch=10)
 
+    def displayPixmap(self, pixmap: QPixmap):
+        frame_height = self.panel_frame.geometry().height()
+        frame_width = self.panel_frame.geometry().width()
 
-def validateImg(img: MatLike):
-    if img.dtype != np.uint8:
-        raise TypeError("Expected uint8 image")
-    if img.ndim not in (2, 3): 
-        raise ValueError("Not an image") 
-    if img.ndim == 3 and img.shape[2] not in (3, 4): 
-        raise ValueError("Unsupported channel count")        
+        scaled_pixmap = pixmap.scaled(
+            frame_width,
+            frame_height,
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
+        )
 
-#TODO Write QTMatLikeWrapper class that infers the type when constructed and has a to QTImage function
-def matLikeToQImage(img: MatLike) -> QImage:
-    validateImg(img)
+        self.panel_frame.setPixmap(scaled_pixmap)
 
-    # Grayscale
-    if img.ndim == 2:
-        rgb = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
+    def onNext(self):
+        if not self.index <= self.page_count - 1:
+            return 0
+        
+        self.index += 1
+        self.timeline_context.updatePageCount(self.index, self.page_count)
+        self.request_page.emit(self.index)
 
-    # Color
-    elif img.ndim == 3:
-        if img.shape[2] == 3:
-            rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        elif img.shape[2] == 4:
-            rgb = cv2.cvtColor(img, cv2.COLOR_BGRA2RGB)
-        else:
-            raise ValueError("Unsupported channel count")
-
-    else:
-        raise ValueError("Unsupported image dimensionality")
-    
-    h, w, _ = rgb.shape
-    return QImage(
-        rgb.data,
-        w,               # width
-        h,               # height
-        rgb.strides[0],
-        QImage.Format.Format_RGB888
-    ).copy()
+    def onPrevious(self):
+        if not self.index > 0:
+            return 0
+        
+        self.index -= 1
+        self.timeline_context.updatePageCount(self.index, self.page_count)
+        self.request_page.emit(self.index)
