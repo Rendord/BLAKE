@@ -88,10 +88,11 @@ class TimeLineApplicationView(QWidget):
     layout: QVBoxLayout
     timeline_context: TimeLineContext
     panel_frame: QLabel
+    frame_resolution: Tuple[int,int]
     navigation_controls: NavigationControls
     index: int
     page_count: int
-    request_page = pyqtSignal(int)
+    request_page = pyqtSignal(int, tuple)
 
     def __init__(self, page_count, pixmap: QPixmap, scaled_resolution: Tuple[int,int]):
         super().__init__()
@@ -99,6 +100,7 @@ class TimeLineApplicationView(QWidget):
         self.page_count = page_count
         self.layout = QVBoxLayout(self)
         self.timeline_context = TimeLineContext(self.page_count)
+        self.frame_resolution = scaled_resolution
         frame_w, frame_h = scaled_resolution
         self.panel_frame = QLabel()
         self.panel_frame.setFixedSize(frame_w, frame_h)
@@ -111,17 +113,7 @@ class TimeLineApplicationView(QWidget):
         self.layout.addWidget(self.navigation_controls, stretch=10)
 
     def displayPixmap(self, pixmap: QPixmap):
-        frame_height = self.panel_frame.geometry().height()
-        frame_width = self.panel_frame.geometry().width()
-
-        scaled_pixmap = pixmap.scaled(
-            frame_width,
-            frame_height,
-            Qt.AspectRatioMode.KeepAspectRatio,
-            Qt.TransformationMode.SmoothTransformation
-        )
-
-        self.panel_frame.setPixmap(scaled_pixmap)
+        self.panel_frame.setPixmap(pixmap)
 
     def onNext(self):
         if not self.index <= self.page_count - 1:
@@ -129,7 +121,7 @@ class TimeLineApplicationView(QWidget):
         
         self.index += 1
         self.timeline_context.updatePageCount(self.index, self.page_count)
-        self.request_page.emit(self.index)
+        self.request_page.emit(self.index, self.frame_resolution)
 
     def onPrevious(self):
         if not self.index > 0:
@@ -137,4 +129,4 @@ class TimeLineApplicationView(QWidget):
         
         self.index -= 1
         self.timeline_context.updatePageCount(self.index, self.page_count)
-        self.request_page.emit(self.index)
+        self.request_page.emit(self.index, self.frame_resolution)

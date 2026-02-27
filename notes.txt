@@ -24,3 +24,23 @@ Adding alternative numpad controls
 # so we need to find a way to complete lines and make them thicker
 
 See if we can prompt claude to turn my codebases TODO's into actionable github issues
+
+cache_id = (epoch + history_hash + index)
+
+
+we have 2 queues in controller (high priority + low priority)
+we prefetch surroundings neighbours
+
+
+#TODO
+implement fetching neigbhours
+
+main loop in CVController
+
+Connect thread.started → controller.run
+
+UI signals enqueue jobs into high_q
+Whenever model state changes we enqueue jobs into low queue
+implement low queue as LRUcache? 
+
+#TODO implement operations
