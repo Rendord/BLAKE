@@ -2,11 +2,19 @@
 #TODO write a shell/bash script that does this automatically
 [project]
 name = "blake"
-version = "0.0.0"
+version = "0.1.0"
 requires-python = ">=3.10"
 dependencies = [
   "numpy>=1.24.0",
   "opencv-python>=4.8.0",
   "PyQt6>=6.6.0",
-  "Pillow>=10.0.0",
+  "pillow>=10.0.0",
+  "packaging>=26.0",
+  "pyvips>=3.1.1",
 ]
+
+[tool.uv]
+package = true
+
+[project.scripts]
+viewer = "handwritten.app:main"
