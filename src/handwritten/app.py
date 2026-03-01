@@ -33,6 +33,8 @@ def main():
     window = TimeLineApplicationView(page_count=page_count, scaled_resolution=scaled_resolution)
 
     window.request_page.connect(controller.fetchPage)
+    window.insert_op.connect(controller.insertOperation)
+    window.remove_op.connect(controller.removeOperation)
     controller.send_image.connect(window.displayPixmap)
 
     #TODO refactor setup so first page to display is rendered dynamically

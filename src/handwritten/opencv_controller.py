@@ -81,6 +81,12 @@ class OpenCVController(QObject):
         else: 
             render_job = RenderJob(index, self.target_resolution, 0) #  , self.image_paths[index]
             self.queueRender(render_job)
+
+    def insertOperation(self, operation_name: str):
+        print(str(operation_name))
+
+    def removeOperation(self):
+        print("remove operation")
         
         
     def prefetchRenders(self):

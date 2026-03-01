@@ -32,7 +32,7 @@ class TimeLineContext(QWidget):
     op_dropdown: QComboBox
     insert_op: ExpandingButton
     iteration_idx: ExpandingTextLabel
-    insert = pyqtSignal(str)
+    insert = pyqtSignal()
     remove = pyqtSignal()
 
     def __init__(self, page_count):
@@ -40,10 +40,12 @@ class TimeLineContext(QWidget):
         self.layout = QHBoxLayout(self)
         self.page_count = ExpandingTextLabel(f"Panel: 1 / {page_count}")
         self.remove_op = ExpandingButton("-")
+        self.remove_op.clicked.connect(self.remove)
         self.op_dropdown = QComboBox()
         self.op_dropdown.addItems((label for label in operations.VisOp.registry.keys()))
         self.insert_op = ExpandingButton("+")
-        self.iteration_idx = ExpandingTextLabel("Iteration: 0/0")
+        self.insert_op.clicked.connect(self.insert)
+        self.iteration_idx = ExpandingTextLabel("Iteration: 0")
         self.iteration_idx.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.layout.addWidget(self.page_count, stretch=10)
         self.layout.addWidget(self.remove_op, stretch=5)
@@ -55,6 +57,8 @@ class TimeLineContext(QWidget):
     def updatePageCount(self, index: int, page_count: int):
         self.page_count.setText(f"Panel: {index + 1} / {page_count}") 
 
+    def updateIteration(self, iteration: int):
+        self.page_count.setText(f"Iteration: {iteration}") 
 
 class NavigationControls(QWidget):
     layout: QHBoxLayout
@@ -105,6 +109,8 @@ class TimeLineApplicationView(QWidget):
         self.page_count = page_count
         self.layout = QVBoxLayout(self)
         self.timeline_context = TimeLineContext(self.page_count)
+        self.timeline_context.insert.connect(self.onInsert)
+        self.timeline_context.remove.connect(self.onRemove)
         frame_w, frame_h = scaled_resolution
         self.panel_frame = QLabel()
         self.panel_frame.setFixedSize(frame_w, frame_h)
@@ -137,6 +143,13 @@ class TimeLineApplicationView(QWidget):
         self.timeline_context.updatePageCount(self.index, self.page_count)
         self.request_page.emit(self.index)
 
+    def onInsert(self):
+        operation_name = self.timeline_context.op_dropdown.currentText()
+        self.insert_op.emit(operation_name)
+
+    def onRemove(self):
+        self.remove_op.emit()
+
     def keyPressEvent(self, event):
 
         if event.key() == Qt.Key.Key_Right:
@@ -145,6 +158,14 @@ class TimeLineApplicationView(QWidget):
 
         elif event.key() == Qt.Key.Key_Left:
             self.onPrevious()
+            QCoreApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
+
+        elif event.key() in (Qt.Key.Key_Plus, Qt.Key.Key_Equal):
+            self.onInsert()
+            QCoreApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
+
+        elif event.key() in (Qt.Key.Key_Minus, Qt.Key.Key_hyphen):
+            self.onRemove()
             QCoreApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
             
         else:
