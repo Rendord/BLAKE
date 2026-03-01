@@ -44,3 +44,63 @@ Whenever model state changes we enqueue jobs into low queue
 implement low queue as LRUcache? 
 
 #TODO implement operations
+
+
+Increment epoch (so any in-flight work becomes stale)
+
+Swap in a new queue for new jobs
+
+Stop old workers by pushing N sentinels into the old queue (N = number of workers) (can push sentinels wihth -1)
+
+Start new workers that read from the new queue (or reuse the same worker objects but after they exit / restart)
+
+old queue gets collected by GC
+
+Need to implement additional cache for FullRenders
+
+UIRendercache
+FullresolutionCache
+
+1 LRUCache
+
+Controller perform prefetches based on the current index
+
+
+track current index based on fetch page signal
+
+Queues a job with lower priority -> Render of a Page that we don't have yet and then we add it to the LRUCache
+
+we check in worker to see if the index/key already exists in the cache 
+
+do we prefetch
+
+we initiialize and then prefetch 5 pages and open the window when we are done?
+
+prefetch index determiner algorithm 
+we need to run this algorithm on every page request
+cannot be lower than zero
+and needs to be -2 and +2 from the current index
+if the current index is lower than 3
+we can fetch +3 +4 
+and needs to check the LRUCache to see if it's already been added!
+
+if queued
+    skip
+
+
+
+distance is 4-5
+
+NonOperation that does nothing to be the tail of the LinkedList upon creation
+Once we hit the max Operations we release the current tail and rebind it
+
+
+up arrow key goes up the linked list
+down arrow key goes down the linked list
+left arrow key goes to the previous manga panel
+right arrow key goes to the next manga panel
+r resets the panel session
+
+
++ applies the currently selected operation to the current point of the linked list
+- removes the currently viewed operation from the linked list
