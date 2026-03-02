@@ -3,6 +3,8 @@ from typing import Protocol
 import numpy as np
 import cv2
 
+
+#TODO implement VisOp as Abstract BaseClass so that arguments for apply are enforced in subclasses
 class VisOpProtocol(Protocol):
     def apply(self) -> np.ndarray: ...
     def signature(self) -> int: ...
@@ -30,12 +32,18 @@ class ThresholdOp(VisOp):
     Binary thresholding operation.
     """
     threshold_value: int = 128
+    strength_multiplier: float = 1.1
     label = "Threshold"
 
-    def apply(self, img: np.ndarray) -> np.ndarray:
+    def apply(self, img: np.ndarray, strength: int) -> np.ndarray:
         if len(img.shape) > 2:
             img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-        _, result = cv2.threshold(img, self.threshold_value, 255, cv2.THRESH_BINARY)
+        if strength > 1:
+            threshold_value = self.threshold_value * (self.strength_multiplier ** strength)
+            print(threshold_value)
+        else:
+            threshold_value = self.threshold_value 
+        _, result = cv2.threshold(img, threshold_value, 255, cv2.THRESH_BINARY)
         return result
     
     def signature(self):
@@ -49,9 +57,9 @@ class MorphOpenOp(VisOp):
     kernel_size: int = 3
     label = "Morph Open"
 
-    def apply(self, img: np.ndarray) -> np.ndarray:
+    def apply(self, img: np.ndarray, strength: int) -> np.ndarray:
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (self.kernel_size, self.kernel_size))
-        return cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel, iterations=1)
+        return cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel, iterations=strength)
     
     def signature(self):
         return hash((self.label, self.kernel_size))
@@ -65,9 +73,9 @@ class MorphCloseOp(VisOp):
     kernel_size: int = 3
     label = "Morph Close"
 
-    def apply(self, img: np.ndarray) -> np.ndarray:
+    def apply(self, img: np.ndarray, strength: int) -> np.ndarray:
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (self.kernel_size, self.kernel_size))
-        return cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel, iterations=1)
+        return cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel, iterations=strength)
     
     def signature(self):
         return hash((self.label, self.kernel_size))
@@ -82,7 +90,7 @@ class InvertOp(VisOp):
     """
     label = "Invert"
 
-    def apply(self, img: np.ndarray) -> np.ndarray:
+    def apply(self, img: np.ndarray, strength: int) -> np.ndarray:
         return 255 - img
     
     def signature(self):

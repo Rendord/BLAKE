@@ -5,6 +5,7 @@ if TYPE_CHECKING:
 from .types import RenderJob
 from PyQt6.QtCore import pyqtSignal, QObject, Qt
 from PyQt6.QtGui import QImage
+from handwritten.operations import ThresholdOp
 import cv2
 import numpy as np
 import time
@@ -47,7 +48,7 @@ class OpenCVWorker(QObject):
             if base_render is None:
                 base_render = self.renderQImage(job)
 
-            result = self.applyOperations(base_render)
+            result = self.applyOperations(base_render, self.controller.timeline.current.history_hash)
 
             image = (
             matLikeToQImage(result)
@@ -98,16 +99,22 @@ class OpenCVWorker(QObject):
 
         return img_np
     
-    def applyOperations(self, img: MatLike) -> MatLike:
+    def applyOperations(self, img: MatLike, target_hash: int) -> MatLike:
         node = self.controller.timeline.tail #root node
-        current_hash = self.controller.timeline.current.history_hash
+        current_hash = target_hash
+        base_img = img
 
         print(str(self.controller.timeline.timeline_size))
 
         while node.history_hash != current_hash:
             if node.next is not None:
                 node = node.next
-                img = node.op.apply(img)
+                #TODO refactor application of threshold strength!
+                if isinstance(node.op, ThresholdOp):
+                    img = self.applyOperations(base_img, node.findStartOfStack())
+                    img = node.op.apply(img, node.strength)
+                else: 
+                    img = node.op.apply(img, node.strength)
 
         return img
         

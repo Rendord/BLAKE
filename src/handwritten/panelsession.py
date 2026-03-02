@@ -11,11 +11,13 @@ class TimeLineNode():
     history_hash: int
     op: VisOp
     label: str
+    strength: int
     next: Optional["TimeLineNode"]
     previous: Optional["TimeLineNode"]
 
     def __init__(self, op: VisOp | None):
         self.op = op
+        self.strength = 1
         #TODO Rework root tracking
         if op is not None:
             self.label = op.label
@@ -35,8 +37,25 @@ class TimeLineNode():
         node = self
 
         while node is not None:
+            node.calculateStrength()
             node.genHash()
             node = node.next
+
+    def calculateStrength(self):
+        if isinstance(self.previous.op, type(self.op)):
+            self.strength = self.previous.strength + 1
+        # else:
+        #     self.strength = 0
+
+    def findStartOfStack(self):
+        node = self
+        while node is not None and isinstance(node.previous.op, type(self.op)):
+            node = node.previous
+
+        if node.previous is not None:
+            return node.previous.history_hash
+        else:
+            return node.history_hash
 
 
 class OperationTimeline():
@@ -61,7 +80,8 @@ class OperationTimeline():
         insertion.next = cur.next
         cur.next = insertion
         insertion.previous = cur
-        insertion.genHash()
+        insertion.propogateHistory()
+        print(insertion.strength)
         print("hash at time of insertion: " + str(insertion.history_hash))
 
         # if self.timeline_size >= self.MAX_OPERATIONS:

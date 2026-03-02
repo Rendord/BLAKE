@@ -86,6 +86,7 @@ class OpenCVController(QObject):
 
     def removeOperation(self):
         self.timeline.removeCurrent()
+        print("strength after removal " + str(self.timeline.current.strength))
         self.timeline_size_change.emit(self.timeline.timeline_size)
         self.queueRender(RenderJob(self.current_index, self.target_resolution, 0))
 

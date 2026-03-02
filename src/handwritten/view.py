@@ -175,11 +175,13 @@ class TimeLineApplicationView(QWidget):
         self.insert_op.emit(operation_name)
 
     def onRemove(self):
+        if self.iteration == self.max_iteration and self.max_iteration > 0:
+            self.iteration -= 1
         self.remove_op.emit()
 
     def changeTimeLineSize(self, int: int):
         self.max_iteration = int
-        self.timeline_context.updateIteration(int)
+        self.timeline_context.updateIteration(self.iteration)
 
 def print_debug_image(image, panel_frame):
     # 1. Get the actual pixel dimensions (Physical)
