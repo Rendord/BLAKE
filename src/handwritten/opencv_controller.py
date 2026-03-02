@@ -4,6 +4,7 @@ from PyQt6.QtCore import pyqtSignal, QObject
 from PyQt6.QtGui import QImage
 from PyQt6.QtCore import QThread
 from handwritten.types import RenderJob
+from handwritten.operations import VisOp
 from typing import List, Tuple
 from pathlib import Path
 from queue import PriorityQueue
@@ -48,7 +49,7 @@ class OpenCVController(QObject):
             thread.start()
             
     def handleRender(self, render_job: RenderJob, image: QImage):
-        if render_job.priority == 0 and render_job.index == self.current_index:
+        if render_job.priority == 0:
             self.send_image.emit(image)
         self.lru_cache.put(render_job.index, image)
         
@@ -83,7 +84,10 @@ class OpenCVController(QObject):
             self.queueRender(render_job)
 
     def insertOperation(self, operation_name: str):
-        print(str(operation_name))
+        vis_op = VisOp.create(operation_name)
+        self.timeline.insertNode(vis_op)
+        RenderJob(self.current_index, self.target_resolution, 0)
+        self.queueRender()
 
     def removeOperation(self):
         print("remove operation")
