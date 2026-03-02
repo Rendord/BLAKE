@@ -127,8 +127,8 @@ class TimeLineApplicationView(QWidget):
         self.navigation_controls = NavigationControls()
         self.navigation_controls.next.connect(self.onNext)
         self.navigation_controls.previous.connect(self.onPrevious)
-        # self.navigation_controls.ascend.connect(self.onAscend)
-        # self.navigation_controls.descend.connect(self.onDescend)
+        self.navigation_controls.ascend.connect(self.onAscend)
+        self.navigation_controls.descend.connect(self.onDescend)
         self.layout.addWidget(self.timeline_context, stretch=5)
         self.layout.addWidget(self.panel_frame, alignment=Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(self.navigation_controls, stretch=10)
@@ -153,21 +153,18 @@ class TimeLineApplicationView(QWidget):
         self.timeline_context.updatePageCount(self.index, self.page_count)
         self.request_page.emit(self.index)
 
-    # def onAscend(self):
-    #     if self.index >= self.page_count - 1:
-    #         return 0
-        
-    #     self.index += 1
-    #     self.timeline_context.updatePageCount(self.index, self.page_count)
-    #     self.request_page.emit(self.index)
+    def onAscend(self):
+        self.iteration += 1
+        self.timeline_context.updateIteration(self.iteration)
+        self.ascend_timeline.emit()
 
-    # def onDescend(self):
-    #     if not self.index > 0:
-    #         return 0
+    def onDescend(self):
+        if not self.iteration > 0:
+            return 0
         
-    #     self.index -= 1
-    #     self.timeline_context.updatePageCount(self.index, self.page_count)
-    #     self.request_page.emit(self.index)
+        self.iteration -= 1
+        self.timeline_context.updateIteration(self.iteration)
+        self.descend_timeline.emit()
 
     def onInsert(self):
         operation_name = self.timeline_context.op_dropdown.currentText()
