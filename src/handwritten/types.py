@@ -7,5 +7,4 @@ class RenderJob():
     index: int
     resolution: Tuple[int, int]
     priority: int
-    timeline_tail: TimeLineNode
-    #path: str
+#   history_hash: int

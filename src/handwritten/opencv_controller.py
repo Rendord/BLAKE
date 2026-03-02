@@ -51,13 +51,12 @@ class OpenCVController(QObject):
     def handleRender(self, render_job: RenderJob, image: QImage):
         if render_job.priority == 0:
             self.send_image.emit(image)
-        self.lru_cache.put(render_job.index, image)
-        
 
     def loadImagePaths(self, src: str | Path) -> int:
         src = Path(src)
 
-        if not src.is_dir(): return 0
+        if not src.is_dir(): 
+            return 0
 
         valid_extensions = {'.jp2','.png','.jpeg','.jpg','.webp'}
 
@@ -74,23 +73,25 @@ class OpenCVController(QObject):
         self.current_index = index
         self.prefetchRenders()
     
-        #check cache
-        image = self.lru_cache.get(index)
-        if image is not None:
-            self.send_image.emit(image)
-            return
-        else: 
-            render_job = RenderJob(index, self.target_resolution, 0) #  , self.image_paths[index]
-            self.queueRender(render_job)
+        render_job = RenderJob(index, self.target_resolution, 0) #  , self.image_paths[index]
+        self.queueRender(render_job)
 
     def insertOperation(self, operation_name: str):
         vis_op = VisOp.create(operation_name)
         self.timeline.insertNode(vis_op)
-        RenderJob(self.current_index, self.target_resolution, 0)
-        self.queueRender()
+        self.timeline.ascend()
+        self.queueRender(RenderJob(self.current_index, self.target_resolution, 0))
 
     def removeOperation(self):
         print("remove operation")
+
+    def onAscend(self):
+        self.timeline.ascend()
+        self.queueRender(RenderJob(self.current_index, self.target_resolution, 0))
+
+    def onDescend(self):
+        self.timeline.ascend()
+        self.queueRender(RenderJob(self.current_index, self.target_resolution, 0))
         
         
     def prefetchRenders(self):
@@ -139,6 +140,7 @@ class OpenCVController(QObject):
         job = render_job
         queue_item = (prio, seq, job)
         self.priority_queue.put(queue_item)
+        print("job queued")
 
     def stop(self):
         # one sentinel per worker

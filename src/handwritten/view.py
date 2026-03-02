@@ -68,6 +68,8 @@ class NavigationControls(QWidget):
     down_arrow: ExpandingButton
     next = pyqtSignal()
     previous = pyqtSignal()
+    ascend = pyqtSignal()
+    descend = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -78,7 +80,9 @@ class NavigationControls(QWidget):
         self.right_arrow = ExpandingButton("→")
         self.right_arrow.clicked.connect(self.next)
         self.up_arrow = ExpandingButton("↑")
+        self.up_arrow.clicked.connect(self.ascend)
         self.down_arrow = ExpandingButton("↓")
+        self.down_arrow.clicked.connect(self.descend)
 
         #create middle layout
         up_down = QVBoxLayout()
@@ -97,15 +101,19 @@ class TimeLineApplicationView(QWidget):
     panel_frame: QLabel
     navigation_controls: NavigationControls
     index: int
+    iteration: int
     page_count: int
     request_page = pyqtSignal(int)
     insert_op = pyqtSignal(str)
     remove_op = pyqtSignal()
+    ascend_timeline = pyqtSignal()
+    descend_timeline = pyqtSignal()
     #viewport_changed = pyqtSignal(tuple(int,int))
 
     def __init__(self, page_count, scaled_resolution: Tuple[int,int]):
         super().__init__()
         self.index = 0
+        self.iteration = 0
         self.page_count = page_count
         self.layout = QVBoxLayout(self)
         self.timeline_context = TimeLineContext(self.page_count)
@@ -119,6 +127,8 @@ class TimeLineApplicationView(QWidget):
         self.navigation_controls = NavigationControls()
         self.navigation_controls.next.connect(self.onNext)
         self.navigation_controls.previous.connect(self.onPrevious)
+        # self.navigation_controls.ascend.connect(self.onAscend)
+        # self.navigation_controls.descend.connect(self.onDescend)
         self.layout.addWidget(self.timeline_context, stretch=5)
         self.layout.addWidget(self.panel_frame, alignment=Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(self.navigation_controls, stretch=10)
@@ -142,6 +152,22 @@ class TimeLineApplicationView(QWidget):
         self.index -= 1
         self.timeline_context.updatePageCount(self.index, self.page_count)
         self.request_page.emit(self.index)
+
+    # def onAscend(self):
+    #     if self.index >= self.page_count - 1:
+    #         return 0
+        
+    #     self.index += 1
+    #     self.timeline_context.updatePageCount(self.index, self.page_count)
+    #     self.request_page.emit(self.index)
+
+    # def onDescend(self):
+    #     if not self.index > 0:
+    #         return 0
+        
+    #     self.index -= 1
+    #     self.timeline_context.updatePageCount(self.index, self.page_count)
+    #     self.request_page.emit(self.index)
 
     def onInsert(self):
         operation_name = self.timeline_context.op_dropdown.currentText()

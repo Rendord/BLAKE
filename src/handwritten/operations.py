@@ -5,7 +5,7 @@ import cv2
 
 class VisOpProtocol(Protocol):
     def apply(self) -> np.ndarray: ...
-    def signature(self) -> tuple: ...
+    def signature(self) -> int: ...
 
 class VisOp(VisOpProtocol):
     registry: dict[str, type["VisOp"]] = {}
@@ -17,7 +17,8 @@ class VisOp(VisOpProtocol):
         if cls is VisOp:
             return
         name = cls.label or cls.__name__
-        VisOp.registry[name] = cls
+        if name != "Root": #Needs to be removed ASAP
+            VisOp.registry[name] = cls
 
     @classmethod
     def create(cls, label:str, **kwargs) -> "VisOp":
@@ -32,11 +33,13 @@ class ThresholdOp(VisOp):
     label = "Threshold"
 
     def apply(self, img: np.ndarray) -> np.ndarray:
+        if len(img.shape) > 2:
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         _, result = cv2.threshold(img, self.threshold_value, 255, cv2.THRESH_BINARY)
         return result
     
     def signature(self):
-        return tuple(self.label, self.threshold_value)
+        return hash((self.label, self.threshold_value))
 
 @dataclass(frozen=True)
 class MorphOpenOp(VisOp):
@@ -51,7 +54,7 @@ class MorphOpenOp(VisOp):
         return cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel, iterations=1)
     
     def signature(self):
-        return tuple(self.label, self.kernel_size)
+        return hash((self.label, self.kernel_size))
 
 
 @dataclass(frozen=True)
@@ -67,7 +70,7 @@ class MorphCloseOp(VisOp):
         return cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel, iterations=1)
     
     def signature(self):
-        return tuple(self.label, self.kernel_size)
+        return hash((self.label, self.kernel_size))
 
 
 @dataclass(frozen=True)
@@ -83,6 +86,6 @@ class InvertOp(VisOp):
         return 255 - img
     
     def signature(self):
-        return tuple(self.label)
+        return hash(self.label)
 
 

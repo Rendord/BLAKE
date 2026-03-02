@@ -10,18 +10,26 @@ from handwritten.operations import VisOp
 class TimeLineNode():
     history_hash: int
     op: VisOp
+    label: str
     next: Optional["TimeLineNode"]
     previous: Optional["TimeLineNode"]
 
-    def __init__(self, op: VisOp):
+    def __init__(self, op: VisOp | None):
         self.op = op
+        #TODO Rework root tracking
+        if op is not None:
+            self.label = op.label
+        else:
+            self.label = "Root"
+        self.previous = None
+        self.next = None
         self.genHash()
 
     def genHash(self):
         if self.previous is not None:
-            self.history_hash = hash(self.previous.history_hash, self.op.signature())
+            self.history_hash = hash((self.previous.history_hash, self.op.signature()))
         else:
-            self.history_hash = self.op.signature()
+            self.history_hash = hash(self.label)
 
 
 class OperationTimeline():
@@ -33,8 +41,8 @@ class OperationTimeline():
 
     def __init__(self):
         super().__init__()
-        self.current = None
-        self.tail = None
+        self.tail = TimeLineNode(None)
+        self.current = self.tail
         self.timeline_size = 0
 
     def insertNode(self, vis_op:VisOp) -> None:
@@ -46,6 +54,8 @@ class OperationTimeline():
         insertion.next = cur.next
         cur.next = insertion
         insertion.previous = cur
+        insertion.genHash()
+        print("hash at time of insertion: " + str(insertion.history_hash))
 
         # if self.timeline_size >= self.MAX_OPERATIONS:
         #     #pop oldest

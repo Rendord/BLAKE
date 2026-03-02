@@ -11,6 +11,7 @@ import time
 import pyvips
 from pathlib import Path
 from cv2.typing import MatLike
+#from handwritten.panelsession import TimeLineNode
 
 
 class OpenCVWorker(QObject):
@@ -28,6 +29,9 @@ class OpenCVWorker(QObject):
         while self.running:
             _, _, job = self.controller.priority_queue.get()
 
+            #fold into renderjob
+            dpr = self.controller.device_pixel_ratio
+
             if job is None:
                 self.running = False
                 self.finished.emit()
@@ -36,13 +40,26 @@ class OpenCVWorker(QObject):
             if abs(self.controller.current_index - job.index) > 8:
                 continue
 
-            result = self.renderQImage(job)
+            print("job accepted")
+            
+            base_render = self.controller.lru_cache.get(job.index)
 
-            self.rendered.emit(job, result)
+            if base_render is None:
+                base_render = self.renderQImage(job)
+
+            result = self.applyOperations(base_render)
+
+            image = (
+            matLikeToQImage(result)
+            )
+            image.setDevicePixelRatio(dpr)
+
+            self.rendered.emit(job, image)
 
     def renderQImage(self, render_job: RenderJob) -> QImage:
         #print(render_job.index)
 
+        #fold into renderjob
         dpr = self.controller.device_pixel_ratio
         
         # 2. Calculate PHYSICAL pixels
@@ -56,13 +73,11 @@ class OpenCVWorker(QObject):
             print("read exception" + str(e))
             img = cv2.imread(str(path), cv2.IMREAD_GRAYSCALE)
         elapsed = time.perf_counter() - start_time
+        self.controller.lru_cache.put(render_job.index, img)
+        
         print(f"DEBUG: Loaded in {elapsed:.4f}s")
-        image = (
-            matLikeToQImage(img)
-        )
-        image.setDevicePixelRatio(dpr)
     
-        return image
+        return img
     
     def read_jp2(self, path: str, target_width: int, target_height: int) -> MatLike:
 
@@ -82,6 +97,19 @@ class OpenCVWorker(QObject):
         validateImg(img_np)
 
         return img_np
+    
+    def applyOperations(self, img: MatLike) -> MatLike:
+        node = self.controller.timeline.tail #root node
+        current_hash = self.controller.timeline.current.history_hash
+
+        print(str(self.controller.timeline.timeline_size))
+
+        while node.history_hash != current_hash:
+            if node.next is not None:
+                node = node.next
+                img = node.op.apply(img)
+
+        return img
         
 
 def validateImg(img: MatLike):
