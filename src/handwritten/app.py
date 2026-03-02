@@ -49,7 +49,7 @@ def main():
     QShortcut(QKeySequence(Qt.Key.Key_Up), window, activated=window.onAscend)
     QShortcut(QKeySequence(Qt.Key.Key_Down), window, activated=window.onDescend)
 
-
+    #TODO try out glymur to see if performance is noticesably slower (it should be)
     #TODO refactor setup so first page to display is rendered dynamically
     controller.queueRender(RenderJob(0, scaled_resolution, 0)) #, path=controller.image_paths[0]
     controller.prefetchRenders()

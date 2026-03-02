@@ -85,8 +85,9 @@ class OpenCVController(QObject):
         self.queueRender(RenderJob(self.current_index, self.target_resolution, 0))
 
     def removeOperation(self):
-        print("remove operation")
+        self.timeline.removeCurrent()
         self.timeline_size_change.emit(self.timeline.timeline_size)
+        self.queueRender(RenderJob(self.current_index, self.target_resolution, 0))
 
     def onAscend(self):
         self.timeline.ascend()

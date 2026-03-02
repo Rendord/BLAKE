@@ -31,6 +31,13 @@ class TimeLineNode():
         else:
             self.history_hash = hash(self.label)
 
+    def propogateHistory(self):
+        node = self
+
+        while node is not None:
+            node.genHash()
+            node = node.next
+
 
 class OperationTimeline():
     current: Optional[TimeLineNode]
@@ -66,6 +73,27 @@ class OperationTimeline():
         #     gc.collect()
         # else:
         self.timeline_size += 1
+
+    def removeCurrent(self) -> None:
+        #remove operation into timeline
+        cur = self.current
+
+        if cur.previous is None:
+            return
+
+        cur.previous.next = cur.next 
+
+        if cur.next is not None:
+            cur.next.previous = cur.previous
+            self.current = cur.next
+            self.current.propogateHistory()
+        else: 
+            self.current = cur.previous
+
+        cur.next = None
+        cur.previous = None
+
+        self.timeline_size -= 1
 
     def ascend(self) -> None:        
         cur = self.current
