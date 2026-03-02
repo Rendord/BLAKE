@@ -13,6 +13,7 @@ from handwritten.opencv_worker import OpenCVWorker
 
 class OpenCVController(QObject):
     timeline: OperationTimeline
+    timeline_size_change = pyqtSignal(int)
     send_image = pyqtSignal(QImage)
     image_paths: List[Path]
     current_index: int
@@ -36,7 +37,7 @@ class OpenCVController(QObject):
         self.current_index = 0 #I might want to extract some of this to an initialization step
         self.target_resolution = target_resolution
         self.device_pixel_ratio = dpr
-        self.lru_cache = LRUCache(maxsize=100)
+        self.lru_cache = LRUCache(maxsize=25)
         self.workers.append((QThread(self),OpenCVWorker(self)))
         self.workers.append((QThread(self),OpenCVWorker(self)))
         for thread, worker in self.workers:
@@ -79,18 +80,20 @@ class OpenCVController(QObject):
     def insertOperation(self, operation_name: str):
         vis_op = VisOp.create(operation_name)
         self.timeline.insertNode(vis_op)
+        self.timeline_size_change.emit(self.timeline.timeline_size)
         self.timeline.ascend()
         self.queueRender(RenderJob(self.current_index, self.target_resolution, 0))
 
     def removeOperation(self):
         print("remove operation")
+        self.timeline_size_change.emit(self.timeline.timeline_size)
 
     def onAscend(self):
         self.timeline.ascend()
         self.queueRender(RenderJob(self.current_index, self.target_resolution, 0))
 
     def onDescend(self):
-        self.timeline.ascend()
+        self.timeline.descend()
         self.queueRender(RenderJob(self.current_index, self.target_resolution, 0))
         
         
@@ -99,8 +102,8 @@ class OpenCVController(QObject):
         max_idx = len(self.image_paths) - 1
         c = self.current_index
         #amount of indices to prefetch around current index #TODO make sliding window configurable and add failsafe for sliding window that is too large, write function
-        future = 8
-        past = 8
+        future = 2
+        past = 2
 
         #sliding window that expands inwards near the edges
         if c - past < 0:

@@ -35,7 +35,20 @@ def main():
     window.request_page.connect(controller.fetchPage)
     window.insert_op.connect(controller.insertOperation)
     window.remove_op.connect(controller.removeOperation)
+    window.ascend_timeline.connect(controller.onAscend)
+    window.descend_timeline.connect(controller.onDescend)
     controller.send_image.connect(window.displayPixmap)
+    controller.timeline_size_change.connect(window.changeTimeLineSize)
+
+    # Create a shortcut for the "Insert" action
+    QShortcut(QKeySequence("+"), window, activated=window.onInsert)
+    QShortcut(QKeySequence("="), window, activated=window.onInsert)
+    QShortcut(QKeySequence("-"), window, activated=window.onRemove)
+    QShortcut(QKeySequence(Qt.Key.Key_Left), window, activated=window.onPrevious)
+    QShortcut(QKeySequence(Qt.Key.Key_Right), window, activated=window.onNext)
+    QShortcut(QKeySequence(Qt.Key.Key_Up), window, activated=window.onAscend)
+    QShortcut(QKeySequence(Qt.Key.Key_Down), window, activated=window.onDescend)
+
 
     #TODO refactor setup so first page to display is rendered dynamically
     controller.queueRender(RenderJob(0, scaled_resolution, 0)) #, path=controller.image_paths[0]

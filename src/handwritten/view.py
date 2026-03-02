@@ -58,7 +58,7 @@ class TimeLineContext(QWidget):
         self.page_count.setText(f"Panel: {index + 1} / {page_count}") 
 
     def updateIteration(self, iteration: int):
-        self.page_count.setText(f"Iteration: {iteration}") 
+        self.iteration_idx.setText(f"Iteration: {iteration}") 
 
 class NavigationControls(QWidget):
     layout: QHBoxLayout
@@ -102,6 +102,7 @@ class TimeLineApplicationView(QWidget):
     navigation_controls: NavigationControls
     index: int
     iteration: int
+    max_iteration: int
     page_count: int
     request_page = pyqtSignal(int)
     insert_op = pyqtSignal(str)
@@ -114,6 +115,7 @@ class TimeLineApplicationView(QWidget):
         super().__init__()
         self.index = 0
         self.iteration = 0
+        self.max_iteration = 0
         self.page_count = page_count
         self.layout = QVBoxLayout(self)
         self.timeline_context = TimeLineContext(self.page_count)
@@ -154,6 +156,8 @@ class TimeLineApplicationView(QWidget):
         self.request_page.emit(self.index)
 
     def onAscend(self):
+        if self.iteration >= self.max_iteration:
+            return 0
         self.iteration += 1
         self.timeline_context.updateIteration(self.iteration)
         self.ascend_timeline.emit()
@@ -161,38 +165,21 @@ class TimeLineApplicationView(QWidget):
     def onDescend(self):
         if not self.iteration > 0:
             return 0
-        
         self.iteration -= 1
         self.timeline_context.updateIteration(self.iteration)
         self.descend_timeline.emit()
 
     def onInsert(self):
+        self.iteration += 1
         operation_name = self.timeline_context.op_dropdown.currentText()
         self.insert_op.emit(operation_name)
 
     def onRemove(self):
         self.remove_op.emit()
 
-    def keyPressEvent(self, event):
-
-        if event.key() == Qt.Key.Key_Right:
-            self.onNext()
-            QCoreApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
-
-        elif event.key() == Qt.Key.Key_Left:
-            self.onPrevious()
-            QCoreApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
-
-        elif event.key() in (Qt.Key.Key_Plus, Qt.Key.Key_Equal):
-            self.onInsert()
-            QCoreApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
-
-        elif event.key() in (Qt.Key.Key_Minus, Qt.Key.Key_hyphen):
-            self.onRemove()
-            QCoreApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
-            
-        else:
-            super().keyPressEvent(event)
+    def changeTimeLineSize(self, int: int):
+        self.max_iteration = int
+        self.timeline_context.updateIteration(int)
 
 def print_debug_image(image, panel_frame):
     # 1. Get the actual pixel dimensions (Physical)
