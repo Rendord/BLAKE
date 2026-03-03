@@ -4,7 +4,7 @@ import numpy as np
 from cv2.typing import MatLike
 from dataclasses import dataclass
 import gc
-from handwritten.operations import VisOp
+from viewer.operations import VisOp
 
 
 class TimeLineNode():
@@ -45,7 +45,7 @@ class TimeLineNode():
         if isinstance(self.previous.op, type(self.op)):
             self.strength = self.previous.strength + 1
         # else:
-        #     self.strength = 0
+        #     self.strength = 0 #not sure if we want removing an iteration to maintain a new order 
 
     def findStartOfStack(self):
         node = self

@@ -5,14 +5,14 @@ if TYPE_CHECKING:
 from .types import RenderJob
 from PyQt6.QtCore import pyqtSignal, QObject, Qt
 from PyQt6.QtGui import QImage
-from handwritten.operations import ThresholdOp
+from viewer.operations import ThresholdOp
 import cv2
 import numpy as np
 import time
 import pyvips
 from pathlib import Path
 from cv2.typing import MatLike
-#from handwritten.panelsession import TimeLineNode
+#from viewer.panelsession import TimeLineNode
 
 
 class OpenCVWorker(QObject):

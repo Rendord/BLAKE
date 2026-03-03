@@ -1,10 +1,10 @@
-import handwritten
+import viewer
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtGui import QShortcut, QKeySequence
 from PyQt6.QtCore import Qt, QThread
-from handwritten.view import TimeLineApplicationView
-from handwritten.opencv_controller import OpenCVController
-from handwritten.opencv_controller import RenderJob
+from viewer.view import TimeLineApplicationView
+from viewer.opencv_controller import OpenCVController
+from viewer.opencv_controller import RenderJob
 import sys
 
 def main():

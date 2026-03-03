@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QSizePolicy, QLabel, QVBoxLayout, QHBoxLayout, QPushButton, QComboBox
 from PyQt6.QtCore import QCoreApplication, QEventLoop, Qt, pyqtSignal
 from PyQt6.QtGui import QPixmap, QImage
-from handwritten import operations
+from viewer import operations
 from typing import Tuple
 
 class ColorSquare(QWidget):

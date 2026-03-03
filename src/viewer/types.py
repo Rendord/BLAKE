@@ -1,6 +1,6 @@
 from typing import Tuple
 from dataclasses import dataclass
-from handwritten.panelsession import TimeLineNode
+from viewer.panelsession import TimeLineNode
 
 @dataclass(frozen=True)
 class RenderJob():

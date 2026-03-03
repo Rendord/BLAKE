@@ -1,15 +1,15 @@
-from handwritten.panelsession import OperationTimeline
-from handwritten.cache import LRUCache
+from viewer.panelsession import OperationTimeline
+from viewer.cache import LRUCache
 from PyQt6.QtCore import pyqtSignal, QObject
 from PyQt6.QtGui import QImage
 from PyQt6.QtCore import QThread
-from handwritten.types import RenderJob
-from handwritten.operations import VisOp
+from viewer.types import RenderJob
+from viewer.operations import VisOp
 from typing import List, Tuple
 from pathlib import Path
 from queue import PriorityQueue
 from itertools import count
-from handwritten.opencv_worker import OpenCVWorker
+from viewer.opencv_worker import OpenCVWorker
 
 class OpenCVController(QObject):
     timeline: OperationTimeline

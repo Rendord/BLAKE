@@ -3,7 +3,7 @@
 [project]
 name = "blake"
 version = "0.1.0"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
   "numpy>=1.24.0",
   "opencv-python>=4.8.0",
@@ -17,4 +17,4 @@ dependencies = [
 package = true
 
 [project.scripts]
-viewer = "handwritten.app:main"
+viewer = "viewer.app:main"
