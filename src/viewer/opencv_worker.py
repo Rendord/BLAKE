@@ -41,7 +41,7 @@ class OpenCVWorker(QObject):
             if abs(self.controller.current_index - job.index) > 8:
                 continue
 
-            print("job accepted")
+            #print("job accepted")
             
             base_render = self.controller.lru_cache.get(job.index)
 
@@ -104,7 +104,7 @@ class OpenCVWorker(QObject):
         current_hash = target_hash
         base_img = img
 
-        print(str(self.controller.timeline.timeline_size))
+        #print(str(self.controller.timeline.timeline_size))
 
         while node.history_hash != current_hash:
             if node.next is not None:

@@ -81,7 +81,7 @@ class OperationTimeline():
         cur.next = insertion
         insertion.previous = cur
         insertion.propogateHistory()
-        print(insertion.strength)
+        #print(insertion.strength)
         print("hash at time of insertion: " + str(insertion.history_hash))
 
         # if self.timeline_size >= self.MAX_OPERATIONS:
@@ -107,6 +107,8 @@ class OperationTimeline():
             cur.next.previous = cur.previous
             self.current = cur.next
             self.current.propogateHistory()
+            if isinstance(cur.next, type(self.current)) and cur.strength == self.current.strength:
+                print("recalculated strength of next node is same as removed node")
         else: 
             self.current = cur.previous
 

@@ -18,7 +18,7 @@ def _init_vips():
         if vips_bin.exists():
             # This is the magic line for Python 3.8+ on Windows
             os.add_dll_directory(str(vips_bin))
-            os.add_dll_directory(str(vips_modules))
+            os.environ["PATH"] = str(vips_bin.resolve()) + os.pathsep + os.environ["PATH"]
         else:
             print(f"Warning: VIPS binaries not found at {vips_bin}")
 

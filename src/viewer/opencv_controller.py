@@ -85,8 +85,9 @@ class OpenCVController(QObject):
         self.queueRender(RenderJob(self.current_index, self.target_resolution, 0))
 
     def removeOperation(self):
+        if self.timeline.timeline_size > 0:
+            print("removed node: new timeline size " + str(self.timeline.timeline_size - 1))
         self.timeline.removeCurrent()
-        print("strength after removal " + str(self.timeline.current.strength))
         self.timeline_size_change.emit(self.timeline.timeline_size)
         self.queueRender(RenderJob(self.current_index, self.target_resolution, 0))
 
@@ -104,8 +105,8 @@ class OpenCVController(QObject):
         max_idx = len(self.image_paths) - 1
         c = self.current_index
         #amount of indices to prefetch around current index #TODO make sliding window configurable and add failsafe for sliding window that is too large, write function
-        future = 2
-        past = 2
+        future = 4
+        past = 4
 
         #sliding window that expands inwards near the edges
         if c - past < 0:
@@ -145,7 +146,7 @@ class OpenCVController(QObject):
         job = render_job
         queue_item = (prio, seq, job)
         self.priority_queue.put(queue_item)
-        print("job queued")
+        #print("job queued")
 
     def stop(self):
         # one sentinel per worker

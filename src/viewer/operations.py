@@ -40,7 +40,7 @@ class ThresholdOp(VisOp):
             img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         if strength > 1:
             threshold_value = self.threshold_value * (self.strength_multiplier ** strength)
-            print(threshold_value)
+            #print(threshold_value)
         else:
             threshold_value = self.threshold_value 
         _, result = cv2.threshold(img, threshold_value, 255, cv2.THRESH_BINARY)
