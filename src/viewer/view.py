@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QSizePolicy, QLabel, QVBoxLayout, QHBoxLayout, QPushButton, QComboBox
-from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtCore import QCoreApplication, QEventLoop, Qt, pyqtSignal
+from PyQt6.QtGui import QPixmap, QImage
+from viewer import operations
 from typing import Tuple
 
 class ColorSquare(QWidget):
@@ -31,16 +32,20 @@ class TimeLineContext(QWidget):
     op_dropdown: QComboBox
     insert_op: ExpandingButton
     iteration_idx: ExpandingTextLabel
+    insert = pyqtSignal()
+    remove = pyqtSignal()
 
     def __init__(self, page_count):
         super().__init__()
         self.layout = QHBoxLayout(self)
         self.page_count = ExpandingTextLabel(f"Panel: 1 / {page_count}")
         self.remove_op = ExpandingButton("-")
+        self.remove_op.clicked.connect(self.remove)
         self.op_dropdown = QComboBox()
-        self.op_dropdown.addItems(["Threshold", "MorphOpen", "MorphClose"])
+        self.op_dropdown.addItems((label for label in operations.VisOp.registry.keys()))
         self.insert_op = ExpandingButton("+")
-        self.iteration_idx = ExpandingTextLabel("Iteration: 0/0")
+        self.insert_op.clicked.connect(self.insert)
+        self.iteration_idx = ExpandingTextLabel("Iteration: 0")
         self.iteration_idx.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.layout.addWidget(self.page_count, stretch=10)
         self.layout.addWidget(self.remove_op, stretch=5)
@@ -52,6 +57,8 @@ class TimeLineContext(QWidget):
     def updatePageCount(self, index: int, page_count: int):
         self.page_count.setText(f"Panel: {index + 1} / {page_count}") 
 
+    def updateIteration(self, iteration: int):
+        self.iteration_idx.setText(f"Iteration: {iteration}") 
 
 class NavigationControls(QWidget):
     layout: QHBoxLayout
@@ -61,6 +68,8 @@ class NavigationControls(QWidget):
     down_arrow: ExpandingButton
     next = pyqtSignal()
     previous = pyqtSignal()
+    ascend = pyqtSignal()
+    descend = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -71,7 +80,9 @@ class NavigationControls(QWidget):
         self.right_arrow = ExpandingButton("→")
         self.right_arrow.clicked.connect(self.next)
         self.up_arrow = ExpandingButton("↑")
+        self.up_arrow.clicked.connect(self.ascend)
         self.down_arrow = ExpandingButton("↓")
+        self.down_arrow.clicked.connect(self.descend)
 
         #create middle layout
         up_down = QVBoxLayout()
@@ -90,41 +101,46 @@ class TimeLineApplicationView(QWidget):
     panel_frame: QLabel
     navigation_controls: NavigationControls
     index: int
+    iteration: int
+    max_iteration: int
     page_count: int
     request_page = pyqtSignal(int)
+    insert_op = pyqtSignal(str)
+    remove_op = pyqtSignal()
+    ascend_timeline = pyqtSignal()
+    descend_timeline = pyqtSignal()
+    #viewport_changed = pyqtSignal(tuple(int,int))
 
-    def __init__(self, page_count, pixmap: QPixmap, scaled_resolution: Tuple[int,int]):
+    def __init__(self, page_count, scaled_resolution: Tuple[int,int]):
         super().__init__()
         self.index = 0
+        self.iteration = 0
+        self.max_iteration = 0
         self.page_count = page_count
         self.layout = QVBoxLayout(self)
         self.timeline_context = TimeLineContext(self.page_count)
+        self.timeline_context.insert.connect(self.onInsert)
+        self.timeline_context.remove.connect(self.onRemove)
         frame_w, frame_h = scaled_resolution
         self.panel_frame = QLabel()
         self.panel_frame.setFixedSize(frame_w, frame_h)
-        self.displayPixmap(pixmap)
+        self.panel_frame.setScaledContents(False)
+        self.panel_frame.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.navigation_controls = NavigationControls()
         self.navigation_controls.next.connect(self.onNext)
         self.navigation_controls.previous.connect(self.onPrevious)
+        self.navigation_controls.ascend.connect(self.onAscend)
+        self.navigation_controls.descend.connect(self.onDescend)
         self.layout.addWidget(self.timeline_context, stretch=5)
         self.layout.addWidget(self.panel_frame, alignment=Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(self.navigation_controls, stretch=10)
 
-    def displayPixmap(self, pixmap: QPixmap):
-        frame_height = self.panel_frame.geometry().height()
-        frame_width = self.panel_frame.geometry().width()
-
-        scaled_pixmap = pixmap.scaled(
-            frame_width,
-            frame_height,
-            Qt.AspectRatioMode.KeepAspectRatio,
-            Qt.TransformationMode.SmoothTransformation
-        )
-
-        self.panel_frame.setPixmap(scaled_pixmap)
+    def displayPixmap(self, image: QImage):
+        pixmap = QPixmap().fromImage(image)
+        self.panel_frame.setPixmap(pixmap)
 
     def onNext(self):
-        if not self.index <= self.page_count - 1:
+        if self.index >= self.page_count - 1:
             return 0
         
         self.index += 1
@@ -138,3 +154,50 @@ class TimeLineApplicationView(QWidget):
         self.index -= 1
         self.timeline_context.updatePageCount(self.index, self.page_count)
         self.request_page.emit(self.index)
+
+    def onAscend(self):
+        if self.iteration >= self.max_iteration:
+            return 0
+        self.iteration += 1
+        self.timeline_context.updateIteration(self.iteration)
+        self.ascend_timeline.emit()
+
+    def onDescend(self):
+        if not self.iteration > 0:
+            return 0
+        self.iteration -= 1
+        self.timeline_context.updateIteration(self.iteration)
+        self.descend_timeline.emit()
+
+    def onInsert(self):
+        self.iteration += 1
+        operation_name = self.timeline_context.op_dropdown.currentText()
+        self.insert_op.emit(operation_name)
+
+    def onRemove(self):
+        if self.iteration == self.max_iteration and self.max_iteration > 0:
+            self.iteration -= 1
+        self.remove_op.emit()
+
+    def changeTimeLineSize(self, int: int):
+        self.max_iteration = int
+        self.timeline_context.updateIteration(self.iteration)
+
+def print_debug_image(image, panel_frame):
+    # 1. Get the actual pixel dimensions (Physical)
+    phys_w = image.width()
+    phys_h = image.height()
+    
+    # 2. Get the scaling factor currently attached to the image
+    dpr = image.devicePixelRatio()
+    
+    # 3. Calculate the size Qt uses for layout (Logical)
+    # If dpr is 2.0, a 2000px image has a 1000px logical size
+    logic_w = phys_w / dpr
+    logic_h = phys_h / dpr
+
+    print(f"--- UI DISPLAY DEBUG ---")
+    print(f"  - QLabel Size:    {panel_frame.width()}x{panel_frame.height()}")
+    print(f"  - Image Physical: {phys_w}x{phys_h}")
+    print(f"  - Image DPR:      {dpr}")
+    print(f"  - Image Logical:  {logic_w}x{logic_h}")

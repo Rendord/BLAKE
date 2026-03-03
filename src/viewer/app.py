@@ -1,0 +1,79 @@
+import viewer
+from PyQt6.QtWidgets import QApplication
+from PyQt6.QtGui import QShortcut, QKeySequence
+from PyQt6.QtCore import Qt, QThread
+from viewer.view import TimeLineApplicationView
+from viewer.opencv_controller import OpenCVController
+from viewer.opencv_controller import RenderJob
+import sys
+
+def main():
+    app = QApplication([])
+
+    # get screen size for scaling
+    window_height = app.primaryScreen().availableGeometry().height()      # excludes taskbar/dock
+    dpr = app.primaryScreen().devicePixelRatio()
+
+    #TODO make resolution checking and window sizing more robust
+    HEIGHT = int(window_height * 0.9)
+    WIDTH = int(HEIGHT * 0.7)
+
+    scaled_resolution = int(WIDTH * 0.85), int(HEIGHT * 0.85) #tuple
+
+    
+    
+    controller = OpenCVController(scaled_resolution, dpr)
+    #TODO decouple image loading and panel session (Create a worker vs panelsession)
+    #initialize viewing session
+
+    #TODO refactor setup so first page to display is rendered dynamically
+    page_count = controller.loadImagePaths('manga_scans/jp2')
+
+    #initialize application window
+    window = TimeLineApplicationView(page_count=page_count, scaled_resolution=scaled_resolution)
+
+    window.request_page.connect(controller.fetchPage)
+    window.insert_op.connect(controller.insertOperation)
+    window.remove_op.connect(controller.removeOperation)
+    window.ascend_timeline.connect(controller.onAscend)
+    window.descend_timeline.connect(controller.onDescend)
+    controller.send_image.connect(window.displayPixmap)
+    controller.timeline_size_change.connect(window.changeTimeLineSize)
+
+    # Create a shortcut for the "Insert" action
+    QShortcut(QKeySequence("+"), window, activated=window.onInsert)
+    QShortcut(QKeySequence("="), window, activated=window.onInsert)
+    QShortcut(QKeySequence("-"), window, activated=window.onRemove)
+    QShortcut(QKeySequence(Qt.Key.Key_Left), window, activated=window.onPrevious)
+    QShortcut(QKeySequence(Qt.Key.Key_Right), window, activated=window.onNext)
+    QShortcut(QKeySequence(Qt.Key.Key_Up), window, activated=window.onAscend)
+    QShortcut(QKeySequence(Qt.Key.Key_Down), window, activated=window.onDescend)
+
+    #TODO try out glymur to see if performance is noticesably slower (it should be)
+    #TODO refactor setup so first page to display is rendered dynamically
+    controller.queueRender(RenderJob(0, scaled_resolution, 0)) #, path=controller.image_paths[0]
+    controller.prefetchRenders()
+
+    def close_app():
+        controller.stop()
+        for thread, _ in controller.workers:
+            thread.quit()
+        for thread, _ in controller.workers:
+            thread.wait()
+        
+        sys.exit()
+
+    window.resize(WIDTH,HEIGHT)
+    window.setFixedSize(window.size())
+
+    app.aboutToQuit.connect(close_app)
+
+    window.show()
+    
+    QShortcut(QKeySequence("Escape"), window, activated=window.close)
+    
+    app.exec()
+
+
+if __name__ == '__main__':
+    main()
