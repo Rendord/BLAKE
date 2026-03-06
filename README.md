@@ -2,6 +2,12 @@
 
 A Python tool for manga panel image processing. Features an interactive timeline-based GUI for experimenting with OpenCV image operations on JP2 manga panel images.
 
+
+
+https://github.com/user-attachments/assets/30474816-1fe2-4302-9731-f8dfea909e4a
+
+
+
 ## Project Structure
 
 ```
