@@ -31,3 +31,10 @@ build/
 .pytest_cache/
 .coverage
 htmlcov/
+
+#environment vars
+.env
+
+#claude
+.mcp.json
+.claude
