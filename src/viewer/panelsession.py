@@ -15,16 +15,17 @@ class TimeLineNode():
     next: Optional["TimeLineNode"]
     previous: Optional["TimeLineNode"]
 
-    def __init__(self, op: VisOp | None):
+    @property
+    def is_root(self) -> bool:
+        return False
+
+    def __init__(self, op: VisOp | None, next: Optional["TimeLineNode"], previous: Optional["TimeLineNode"]):
         self.op = op
         self.strength = 1
-        #TODO Rework root tracking
         if op is not None:
             self.label = op.label
-        else:
-            self.label = "Root"
-        self.previous = None
-        self.next = None
+        self.previous = previous
+        self.next = next
         self.genHash()
 
     def genHash(self):
@@ -49,14 +50,35 @@ class TimeLineNode():
 
     def findStartOfStack(self):
         node = self
-        while node is not None and isinstance(node.previous.op, type(self.op)):
+        while not node.is_root and isinstance(node.previous.op, type(self.op)):
             node = node.previous
 
         if node.previous is not None:
             return node.previous.history_hash
         else:
             return node.history_hash
+        
+    def debug_print(self):
+        print(f"node type: {type(self)}")
+        print(f"node op type: {type(self)} with strength {self.strength}")
+        string = f"next node: {type(self.next)}"
+        if self.next is not None:
+            string += f"operation: {type(self.next.op)} and hash: {self.next.history_hash}"
+        print(string)
+        string = f"next node: {type(self.previous)}"
+        if self.previous is not None:
+            string += f"operation: {type(self.previous.op)} and hash: {self.previous.history_hash}"
+        print(string)
 
+class RootNode(TimeLineNode):
+    label = "Root"
+    strength = 0
+    def __init__(self):
+        super().__init__(op=None, previous=None, next=None)  
+
+    @property
+    def is_root(self) -> bool:
+        return True
 
 class OperationTimeline():
     current: Optional[TimeLineNode]
@@ -67,19 +89,17 @@ class OperationTimeline():
 
     def __init__(self):
         super().__init__()
-        self.tail = TimeLineNode(None)
+        self.tail = RootNode()
         self.current = self.tail
         self.timeline_size = 0
 
     def insertNode(self, vis_op:VisOp) -> None:
-        insertion = TimeLineNode(vis_op)
-        #insert operation into timeline
         cur = self.current
+        #insert operation into timeline
+        insertion = TimeLineNode(op=vis_op,previous=cur,next=cur.next)
         if cur.next is not None:
             cur.next.previous = insertion
-        insertion.next = cur.next
         cur.next = insertion
-        insertion.previous = cur
         insertion.propogateHistory()
         #print(insertion.strength)
         print("hash at time of insertion: " + str(insertion.history_hash))
