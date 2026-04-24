@@ -6,5 +6,6 @@ from viewer.panelsession import TimeLineNode
 class RenderJob():
     index: int
     resolution: Tuple[int, int]
+    device_pixel_ratio: float
     priority: int
 #   history_hash: int

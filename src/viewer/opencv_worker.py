@@ -30,8 +30,6 @@ class OpenCVWorker(QObject):
         while self.running:
             _, _, job = self.controller.priority_queue.get()
 
-            #fold into renderjob
-            dpr = self.controller.device_pixel_ratio
 
             if job is None:
                 self.running = False
@@ -53,15 +51,14 @@ class OpenCVWorker(QObject):
             image = (
             matLikeToQImage(result)
             )
-            image.setDevicePixelRatio(dpr)
+            image.setDevicePixelRatio(job.device_pixel_ratio)
 
             self.rendered.emit(job, image)
 
     def renderQImage(self, render_job: RenderJob) -> QImage:
         #print(render_job.index)
 
-        #fold into renderjob
-        dpr = self.controller.device_pixel_ratio
+        dpr = render_job.device_pixel_ratio
         
         # 2. Calculate PHYSICAL pixels
         phys_w, phys_h = int(render_job.resolution[0] * dpr), int(render_job.resolution[1] * dpr)

@@ -59,6 +59,7 @@ class OpenCVController(QObject):
         if not src.is_dir(): 
             return 0
 
+        #TODO add constants module
         valid_extensions = {'.jp2','.png','.jpeg','.jpg','.webp'}
 
         self.image_paths.clear()
@@ -74,7 +75,7 @@ class OpenCVController(QObject):
         self.current_index = index
         self.prefetchRenders()
     
-        render_job = RenderJob(index, self.target_resolution, 0) #  , self.image_paths[index]
+        render_job = RenderJob(index, self.target_resolution, self.device_pixel_ratio, 0) #  , self.image_paths[index]
         self.queueRender(render_job)
 
     def insertOperation(self, operation_name: str):
@@ -82,28 +83,29 @@ class OpenCVController(QObject):
         self.timeline.insertNode(vis_op)
         self.timeline_size_change.emit(self.timeline.timeline_size)
         self.timeline.ascend()
-        self.queueRender(RenderJob(self.current_index, self.target_resolution, 0))
+        self.queueRender(RenderJob(self.current_index, self.target_resolution, self.device_pixel_ratio, 0))
 
     def removeOperation(self):
         if self.timeline.timeline_size > 0:
             print("removed node: new timeline size " + str(self.timeline.timeline_size - 1))
         self.timeline.removeCurrent()
         self.timeline_size_change.emit(self.timeline.timeline_size)
-        self.queueRender(RenderJob(self.current_index, self.target_resolution, 0))
+        self.queueRender(RenderJob(self.current_index, self.target_resolution, self.device_pixel_ratio, 0))
 
     def onAscend(self):
         self.timeline.ascend()
-        self.queueRender(RenderJob(self.current_index, self.target_resolution, 0))
+        self.queueRender(RenderJob(self.current_index, self.target_resolution, self.device_pixel_ratio, 0))
 
     def onDescend(self):
         self.timeline.descend()
-        self.queueRender(RenderJob(self.current_index, self.target_resolution, 0))
+        self.queueRender(RenderJob(self.current_index, self.target_resolution, self.device_pixel_ratio, 0))
         
         
     def prefetchRenders(self):
         candidates: list[int] = []
         max_idx = len(self.image_paths) - 1
         c = self.current_index
+        #sliding window dataclass? Or better approach 
         #amount of indices to prefetch around current index #TODO make sliding window configurable and add failsafe for sliding window that is too large, write function
         future = 4
         past = 4
@@ -137,7 +139,7 @@ class OpenCVController(QObject):
                 continue
             if i in self.queued_indices:
                 continue
-            self.queueRender(RenderJob(i, self.target_resolution, 1)) #, self.image_paths[i]
+            self.queueRender(RenderJob(i, self.target_resolution, self.device_pixel_ratio, 1)) #, self.image_paths[i]
 
     def queueRender(self, render_job: RenderJob):
         #packing queue item tuple with sequence and prio to determine priority

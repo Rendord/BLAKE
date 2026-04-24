@@ -51,7 +51,7 @@ def main():
 
     #TODO try out glymur to see if performance is noticesably slower (it should be)
     #TODO refactor setup so first page to display is rendered dynamically
-    controller.queueRender(RenderJob(0, scaled_resolution, 0)) #, path=controller.image_paths[0]
+    controller.queueRender(RenderJob(0, scaled_resolution, dpr, 0)) #, path=controller.image_paths[0]
     controller.prefetchRenders()
 
     def close_app():
