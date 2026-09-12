@@ -26,7 +26,7 @@ class OpenCVController(QObject):
     workers: List[Tuple[QThread, OpenCVWorker]]
 
 
-    def __init__(self, target_resolution: Tuple[int, int], dpr: float):
+    def __init__(self, index: int, target_resolution: Tuple[int, int], dpr: float):
         super().__init__()
         self.timeline = OperationTimeline()
         self.priority_queue = PriorityQueue()
@@ -34,7 +34,7 @@ class OpenCVController(QObject):
         self.image_paths = []
         self.queue_seq = count()
         self.workers = []
-        self.current_index = 0 #I might want to extract some of this to an initialization step
+        self.current_index = index
         self.target_resolution = target_resolution
         self.device_pixel_ratio = dpr
         self.lru_cache = LRUCache(maxsize=25)

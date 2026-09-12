@@ -9,3 +9,7 @@ class RenderJob():
     device_pixel_ratio: float
     priority: int
 #   history_hash: int
+
+@dataclass(frozen=True)
+class Settings():
+    index: int

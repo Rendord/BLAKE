@@ -34,6 +34,7 @@ htmlcov/
 
 #environment vars
 .env
+session/
 
 #claude
 .mcp.json

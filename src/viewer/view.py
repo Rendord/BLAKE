@@ -35,10 +35,10 @@ class TimeLineContext(QWidget):
     insert = pyqtSignal()
     remove = pyqtSignal()
 
-    def __init__(self, page_count):
+    def __init__(self, index, page_count):
         super().__init__()
         self.layout = QHBoxLayout(self)
-        self.page_count = ExpandingTextLabel(f"Panel: 1 / {page_count}")
+        self.page_count = ExpandingTextLabel(f"Panel: {index + 1} / {page_count}")
         self.remove_op = ExpandingButton("-")
         self.remove_op.clicked.connect(self.remove)
         self.op_dropdown = QComboBox()
@@ -111,14 +111,14 @@ class TimeLineApplicationView(QWidget):
     descend_timeline = pyqtSignal()
     #viewport_changed = pyqtSignal(tuple(int,int))
 
-    def __init__(self, page_count, scaled_resolution: Tuple[int,int]):
+    def __init__(self, page_count, index, scaled_resolution: Tuple[int,int]):
         super().__init__()
-        self.index = 0
+        self.index = index
         self.iteration = 0
         self.max_iteration = 0
         self.page_count = page_count
         self.layout = QVBoxLayout(self)
-        self.timeline_context = TimeLineContext(self.page_count)
+        self.timeline_context = TimeLineContext(self.index, self.page_count)
         self.timeline_context.insert.connect(self.onInsert)
         self.timeline_context.remove.connect(self.onRemove)
         frame_w, frame_h = scaled_resolution
