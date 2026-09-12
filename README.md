@@ -1,6 +1,6 @@
 # BLAKE
 
-A Python tool for manga panel image processing. Features an interactive timeline-based GUI for experimenting with OpenCV image operations on JP2 manga panel images.
+A Python application for manga panel image processing. Features an interactive timeline-based GUI for experimenting with OpenCV image operations on JP2 manga panel images.
 
 
 

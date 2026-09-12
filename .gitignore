@@ -39,3 +39,5 @@ session/
 #claude
 .mcp.json
 .claude
+
+**/.DS_Store
