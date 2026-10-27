@@ -1,4 +1,3 @@
-import ctypes
 import os
 import platform
 from pathlib import Path
@@ -11,7 +10,7 @@ def _init_vips():
         # src/viewer/__init__.py -> src/viewer -> src -> root
         root = Path(__file__).resolve().parent.parent.parent
         vips_bin = root / "libs" / "vips-dev-8.18"
-        vips_modules = vips_bin / "vips-modules-8.18"
+        #vips_modules = vips_bin / "vips-modules-8.18"
         
         print('-------------------------------------------')
         print("binary_path: " + vips_bin)

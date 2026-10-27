@@ -73,7 +73,7 @@ class OpenCVWorker(QObject):
         start_time = time.perf_counter()
         try:
             img = self.read_jp2(path, phys_w, phys_h)
-        except Exception as e:
+        except (OSError, ValueError) as e:
             print("read exception" + str(e))
             img = cv2.imread(str(path), cv2.IMREAD_GRAYSCALE)
         elapsed = time.perf_counter() - start_time
