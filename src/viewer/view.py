@@ -52,7 +52,7 @@ class TimeLineContext(QWidget):
         self.remove_op = ExpandingButton("-")
         self.remove_op.clicked.connect(self.remove)
         self.op_dropdown = QComboBox()
-        self.op_dropdown.addItems(label for label in operations.VisOp.registry.keys())
+        self.op_dropdown.addItems(operations.VisOp.registry)
         self.insert_op = ExpandingButton("+")
         self.insert_op.clicked.connect(self.insert)
         self.iteration_idx = ExpandingTextLabel("Iteration: 0")

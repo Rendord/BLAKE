@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Protocol
+from typing import ClassVar, Protocol
 
 import cv2
 import numpy as np
@@ -11,7 +11,7 @@ class VisOpProtocol(Protocol):
     def signature(self) -> int: ...
 
 class VisOp(VisOpProtocol):
-    registry: dict[str, type["VisOp"]] = {}
+    registry: ClassVar[dict[str, type["VisOp"]]] = {}
 
     label = ""
 
