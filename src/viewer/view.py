@@ -1,8 +1,18 @@
-from PyQt6.QtWidgets import QWidget, QSizePolicy, QLabel, QVBoxLayout, QHBoxLayout, QPushButton, QComboBox
-from PyQt6.QtCore import QCoreApplication, QEventLoop, Qt, pyqtSignal
-from PyQt6.QtGui import QPixmap, QImage
+
+from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtGui import QImage, QPixmap
+from PyQt6.QtWidgets import (
+    QComboBox,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QSizePolicy,
+    QVBoxLayout,
+    QWidget,
+)
+
 from viewer import operations
-from typing import Tuple
+
 
 class ColorSquare(QWidget):
     def __init__(self, color: str):
@@ -42,7 +52,7 @@ class TimeLineContext(QWidget):
         self.remove_op = ExpandingButton("-")
         self.remove_op.clicked.connect(self.remove)
         self.op_dropdown = QComboBox()
-        self.op_dropdown.addItems((label for label in operations.VisOp.registry.keys()))
+        self.op_dropdown.addItems(label for label in operations.VisOp.registry.keys())
         self.insert_op = ExpandingButton("+")
         self.insert_op.clicked.connect(self.insert)
         self.iteration_idx = ExpandingTextLabel("Iteration: 0")
@@ -111,7 +121,7 @@ class TimeLineApplicationView(QWidget):
     descend_timeline = pyqtSignal()
     #viewport_changed = pyqtSignal(tuple(int,int))
 
-    def __init__(self, page_count, index, scaled_resolution: Tuple[int,int]):
+    def __init__(self, page_count, index, scaled_resolution: tuple[int,int]):
         super().__init__()
         self.index = index
         self.iteration = 0
@@ -196,7 +206,7 @@ def print_debug_image(image, panel_frame):
     logic_w = phys_w / dpr
     logic_h = phys_h / dpr
 
-    print(f"--- UI DISPLAY DEBUG ---")
+    print("--- UI DISPLAY DEBUG ---")
     print(f"  - QLabel Size:    {panel_frame.width()}x{panel_frame.height()}")
     print(f"  - Image Physical: {phys_w}x{phys_h}")
     print(f"  - Image DPR:      {dpr}")

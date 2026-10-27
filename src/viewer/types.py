@@ -1,15 +1,14 @@
-from typing import Tuple
 from dataclasses import dataclass
-from viewer.panelsession import TimeLineNode
+
 
 @dataclass(frozen=True)
-class RenderJob():
+class RenderJob:
     index: int
-    resolution: Tuple[int, int]
+    resolution: tuple[int, int]
     device_pixel_ratio: float
     priority: int
 #   history_hash: int
 
 @dataclass(frozen=True)
-class Settings():
+class Settings:
     index: int

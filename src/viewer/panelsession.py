@@ -1,13 +1,9 @@
-from typing import Protocol, Optional
-from PyQt6.QtCore import Qt
-import numpy as np
-from cv2.typing import MatLike
-from dataclasses import dataclass
-import gc
+from typing import Optional
+
 from viewer.operations import VisOp
 
 
-class TimeLineNode():
+class TimeLineNode:
     history_hash: int
     op: VisOp
     label: str
@@ -80,9 +76,9 @@ class RootNode(TimeLineNode):
     def is_root(self) -> bool:
         return True
 
-class OperationTimeline():
-    current: Optional[TimeLineNode]
-    tail: Optional[TimeLineNode]
+class OperationTimeline:
+    current: TimeLineNode | None
+    tail: TimeLineNode | None
     timeline_size: int
     MAX_OPERATIONS: int = 50
     #lru_cache

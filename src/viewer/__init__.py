@@ -1,7 +1,8 @@
+import ctypes
 import os
 import platform
 from pathlib import Path
-import ctypes
+
 
 def _init_vips():
     os_environment = platform.system()

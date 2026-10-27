@@ -1,32 +1,33 @@
-from viewer.panelsession import OperationTimeline
-from viewer.cache import LRUCache
-from PyQt6.QtCore import pyqtSignal, QObject
-from PyQt6.QtGui import QImage
-from PyQt6.QtCore import QThread
-from viewer.types import RenderJob
-from viewer.operations import VisOp
-from typing import List, Tuple
+from itertools import count
 from pathlib import Path
 from queue import PriorityQueue
-from itertools import count
+
+from PyQt6.QtCore import QObject, QThread, pyqtSignal
+from PyQt6.QtGui import QImage
+
+from viewer.cache import LRUCache
 from viewer.opencv_worker import OpenCVWorker
+from viewer.operations import VisOp
+from viewer.panelsession import OperationTimeline
+from viewer.types import RenderJob
+
 
 class OpenCVController(QObject):
     timeline: OperationTimeline
     timeline_size_change = pyqtSignal(int)
     send_image = pyqtSignal(QImage)
-    image_paths: List[Path]
+    image_paths: list[Path]
     current_index: int
-    target_resolution: Tuple[int, int]
+    target_resolution: tuple[int, int]
     priority_queue: PriorityQueue[RenderJob]
     lru_cache: LRUCache[int, QImage]
     queued_indices: set
     device_pixel_ratio: float
     queue_seq: count
-    workers: List[Tuple[QThread, OpenCVWorker]]
+    workers: list[tuple[QThread, OpenCVWorker]]
 
 
-    def __init__(self, index: int, target_resolution: Tuple[int, int], dpr: float):
+    def __init__(self, index: int, target_resolution: tuple[int, int], dpr: float):
         super().__init__()
         self.timeline = OperationTimeline()
         self.priority_queue = PriorityQueue()

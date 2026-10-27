@@ -1,17 +1,23 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from .opencv_controller import OpenCVController
-from .types import RenderJob
-from PyQt6.QtCore import pyqtSignal, QObject, Qt
-from PyQt6.QtGui import QImage
-from viewer.operations import ThresholdOp
+import time
+from pathlib import Path
+
 import cv2
 import numpy as np
-import time
 import pyvips
-from pathlib import Path
 from cv2.typing import MatLike
+from PyQt6.QtCore import QObject, pyqtSignal
+from PyQt6.QtGui import QImage
+
+from viewer.operations import ThresholdOp
+
+from .types import RenderJob
+
 #from viewer.panelsession import TimeLineNode
 
 

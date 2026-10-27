@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from typing import Protocol
-import numpy as np
+
 import cv2
+import numpy as np
 
 
 #TODO implement VisOp as Abstract BaseClass so that arguments for apply are enforced in subclasses

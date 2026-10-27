@@ -1,15 +1,16 @@
-import viewer
-from PyQt6.QtWidgets import QApplication
-from PyQt6.QtGui import QShortcut, QKeySequence
-from PyQt6.QtCore import Qt, QThread
-from viewer.view import TimeLineApplicationView
-from viewer.opencv_controller import OpenCVController
-from viewer.opencv_controller import RenderJob
-from viewer.types import Settings
-from dataclasses import asdict
-from pathlib import Path
 import json
 import sys
+from dataclasses import asdict
+from pathlib import Path
+
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QKeySequence, QShortcut
+from PyQt6.QtWidgets import QApplication
+
+from viewer.opencv_controller import OpenCVController, RenderJob
+from viewer.types import Settings
+from viewer.view import TimeLineApplicationView
+
 
 def _write_state(page_number: int):
     #/*app: QApplication,**/

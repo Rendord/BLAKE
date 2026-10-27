@@ -15,5 +15,11 @@ dependencies = [
 [tool.uv]
 package = true
 
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff",
+]
+
 [project.scripts]
 viewer = "viewer.app:main"

@@ -1,6 +1,6 @@
 from collections import OrderedDict
-from typing import Generic, Optional, TypeVar
 from threading import Lock
+from typing import Generic, TypeVar
 
 K = TypeVar("K")
 V = TypeVar("V")
@@ -19,7 +19,7 @@ class LRUCache(Generic[K, V]):
         with self._lock:
             return key in self._d
 
-    def get(self, key: K) -> Optional[V]:
+    def get(self, key: K) -> V | None:
         with self._lock:
             if key not in self._d:
                 return None
