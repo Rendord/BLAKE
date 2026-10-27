@@ -12,6 +12,9 @@ ENV/
 # Output directory
 output/
 
+#Data
+data/
+
 # IDE
 .vscode/
 .idea/
