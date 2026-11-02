@@ -15,9 +15,9 @@ class TimeLineNode:
     def is_root(self) -> bool:
         return False
 
-    def __init__(self, op: VisOp | None, next: Optional["TimeLineNode"], previous: Optional["TimeLineNode"]):
+    def __init__(self, op: VisOp | None, next: Optional["TimeLineNode"], previous: Optional["TimeLineNode"], strength: int = 1):
         self.op = op
-        self.strength = 1
+        self.strength = strength
         if op is not None:
             self.label = op.label
         self.previous = previous
@@ -68,9 +68,9 @@ class TimeLineNode:
 
 class RootNode(TimeLineNode):
     label = "Root"
-    strength = 0
+    
     def __init__(self):
-        super().__init__(op=None, previous=None, next=None)  
+        super().__init__(op=None, previous=None, next=None, strength = 0)
 
     @property
     def is_root(self) -> bool:
